@@ -26,22 +26,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   DateTime _date = DateTime.now();
   Account? _account;
   int _balance = 0;
-  bool _saving = false;
 
   int get _amount => parseAmount(_amountCtrl.text);
-
-  bool get _canSave =>
-      !_saving &&
-      _amount > 0 &&
-      _titleCtrl.text.trim().isNotEmpty &&
-      _categoryId != null &&
-      _account != null;
 
   @override
   void initState() {
     super.initState();
-    _amountCtrl.addListener(() => setState(() {}));
-    _titleCtrl.addListener(() => setState(() {}));
+    _amountCtrl.text = '45.000';
+    _titleCtrl.text = 'Makan Siang Kantin';
     _loadAccount();
     _loadCategories();
   }
@@ -68,7 +60,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     if (!mounted) return;
     setState(() {
       _categories = list;
-      _categoryId = null;
+      _categoryId = list.isEmpty ? null : list.first.id;
     });
   }
 
@@ -94,51 +86,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       lastDate: DateTime.now(),
     );
     if (picked != null) setState(() => _date = picked);
-  }
-
-  Future<void> _addCategory() async {
-    final ctrl = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Kategori baru'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(hintText: 'Nama kategori'),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-              child: const Text('Tambah')),
-        ],
-      ),
-    );
-    if (name == null || name.isEmpty) return;
-    await _repo.addCategory(name, _type);
-    await _loadCategories();
-  }
-
-  Future<void> _save() async {
-    if (!_canSave) return;
-    setState(() => _saving = true);
-    final now = DateTime.now();
-    final when =
-        DateTime(_date.year, _date.month, _date.day, now.hour, now.minute);
-    await _repo.addTransaction(
-      title: _titleCtrl.text.trim(),
-      amount: _amount,
-      type: _type,
-      categoryId: _categoryId!,
-      accountId: _account!.id,
-      method: _type == 'income' ? 'Transfer Masuk' : 'Tunai',
-      createdAt: when,
-    );
-    if (!mounted) return;
-    Navigator.of(context).pop();
   }
 
   @override
@@ -185,7 +132,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                           style:
                               TextStyle(fontSize: 12, color: AppColors.muted)),
                       GestureDetector(
-                        onTap: _addCategory,
                         child: const Text('Kelola Kategori',
                             style: TextStyle(
                                 fontSize: 12, fontWeight: FontWeight.w600)),
@@ -205,7 +151,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 width: double.infinity,
                 height: 52,
                 child: FilledButton.icon(
-                  onPressed: _canSave ? _save : null,
+                  onPressed: () => Navigator.of(context).pop(),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.primary,

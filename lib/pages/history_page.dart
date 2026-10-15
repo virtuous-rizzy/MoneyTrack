@@ -43,13 +43,11 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    _repo.changes.addListener(_reload);
     _reload();
   }
 
   @override
   void dispose() {
-    _repo.changes.removeListener(_reload);
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -107,25 +105,6 @@ class _HistoryPageState extends State<HistoryPage> {
     if (result == null) return; // dialog ditutup tanpa memilih
     setState(() => _month = result.year == 0 ? null : result);
     _reload();
-  }
-
-  Future<void> _confirmDelete(TransactionItem t) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hapus transaksi?'),
-        content: Text('"${t.title}" akan dihapus dari riwayat.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Batal')),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Hapus')),
-        ],
-      ),
-    );
-    if (ok == true) await _repo.deleteTransaction(t.id);
   }
 
   @override
@@ -371,7 +350,6 @@ class _HistoryPageState extends State<HistoryPage> {
         TransactionTile(
           item: t,
           timeLabel: timeWib(t.createdAt),
-          onLongPress: () => _confirmDelete(t),
         ),
         const SizedBox(height: 10),
       ],

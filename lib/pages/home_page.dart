@@ -44,13 +44,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _repo.changes.addListener(_reload);
     _reload();
   }
 
   @override
   void dispose() {
-    _repo.changes.removeListener(_reload);
     super.dispose();
   }
 
