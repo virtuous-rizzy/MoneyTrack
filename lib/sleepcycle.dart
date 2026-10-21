@@ -220,7 +220,7 @@ class HasilPage extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: daftarHasil.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final item = daftarHasil[index];
               return Card(

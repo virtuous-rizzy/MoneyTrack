@@ -12,12 +12,12 @@ class TransactionRepository {
   final Account _account = const Account(
     id: 1,
     name: 'Rekening Utama',
-    bank: 'BRI',
+    bank: 'BCA',
     openingBalance: 625000,
   );
 
   final Map<String, String> _settings = {
-    'user_name': 'Sasa',
+    'user_name': 'Rabka',
     'monthly_budget': '3000000',
   };
 
